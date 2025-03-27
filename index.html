@@ -5,55 +5,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paper Timer (3 Hours)</title>
   <style>
+    /* Base Styles */
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       background: linear-gradient(45deg, #ff0099, #ff6600, #66ccff, #33cc33);
       color: white;
       animation: fadeIn 2s ease-in-out, backgroundColorAnimation 6s infinite alternate;
-      height: 100vh;
+      margin: 0;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      margin: 0;
       overflow: hidden;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
     }
     h1 {
-      font-size: 4em;
+      font-size: 3rem;
       font-weight: bold;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       text-shadow: 0 0 20px #fff, 0 0 30px #ff0099, 0 0 50px #ff6600;
     }
     #timer {
-      font-size: 6em;
-      margin-top: 20px;
-      padding: 40px;
+      font-size: 4rem;
+      padding: 20px;
       border-radius: 20px;
       background: rgba(0, 0, 0, 0.7);
       display: inline-block;
       animation: colorChange 3s infinite alternate, glowEffect 1s infinite alternate;
-      text-shadow: 0 0 25px #ff0099, 0 0 50px #ff6600, 0 0 70px #66ccff;
+      text-shadow: 0 0 15px #ff0099, 0 0 30px #ff6600, 0 0 40px #66ccff;
       transition: all 0.3s ease-in-out;
+      margin-bottom: 20px;
     }
     #timer:hover {
-      transform: scale(1.1);
+      transform: scale(1.05);
     }
     button {
-      padding: 15px 25px;
-      font-size: 1.5em;
+      padding: 10px 20px;
+      font-size: 1.2rem;
       margin: 10px;
       cursor: pointer;
       transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-      border: 3px solid #fff;
-      border-radius: 15px;
+      border: 2px solid #fff;
+      border-radius: 10px;
       background-color: transparent;
       color: white;
       font-weight: bold;
     }
     button:hover {
       background-color: #333;
-      transform: scale(1.1);
-      box-shadow: 0 0 15px #ff0099, 0 0 25px #ff6600;
+      transform: scale(1.05);
+      box-shadow: 0 0 10px #ff0099, 0 0 20px #ff6600;
     }
     #startBtn {
       display: inline-block;
@@ -69,7 +75,7 @@
         background-color: #5cb85c;
       }
       100% {
-        transform: scale(1.1);
+        transform: scale(1.05);
         background-color: #d9534f;
       }
     }
@@ -92,10 +98,38 @@
       50% { color: #ff6600; }
       100% { color: #66ccff; }
     }
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.5rem;
+      }
+      #timer {
+        font-size: 3rem;
+        padding: 15px;
+      }
+      button {
+        font-size: 1rem;
+        padding: 8px 16px;
+        margin: 8px;
+      }
+    }
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 2rem;
+      }
+      #timer {
+        font-size: 2.5rem;
+      }
+      button {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+        margin: 6px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div>
+  <div class="container">
     <h1>Paper Timer (3 Hours)</h1>
     <div id="timer">03:00:00</div>
     <div>
@@ -120,24 +154,16 @@
     let isPaused = false;
 
     function startTimer() {
-      // Start background music
       music.currentTime = 0;
       music.play().catch(error => console.log("Autoplay blocked: ", error));
-
-      // Show Stop and Pause buttons; hide Start button
       startBtn.style.display = "none";
       stopBtn.style.display = "inline-block";
       pauseBtn.style.display = "inline-block";
-
-      // Announce start (Google TTS)
       speakText("The paper has started!");
-
-      // Start timer
       interval = setInterval(updateTimer, 1000);
     }
 
     function stopTimer() {
-      // Clear timer and refresh page to reset everything
       clearInterval(interval);
       window.location.reload();
     }
@@ -159,26 +185,20 @@
       let hours = Math.floor(time / 3600);
       let minutes = Math.floor((time % 3600) / 60);
       let seconds = time % 60;
-
       document.getElementById('timer').innerText =
         (hours < 10 ? "0" : "") + hours + ":" +
         (minutes < 10 ? "0" : "") + minutes + ":" +
         (seconds < 10 ? "0" : "") + seconds;
 
-      // When 2 hours remain
       if (time === 2 * 60 * 60) {
         document.getElementById('twoHourSound').play();
         speakText("The time is now two hours remaining!");
         music.volume = 0.3;
       }
-
-      // When 1 hour remains
       if (time === 1 * 60 * 60) {
         document.getElementById('oneHourSound').play();
         speakText("The time is now one hour remaining!");
       }
-
-      // Timer ends
       if (time <= 0) {
         clearInterval(interval);
         document.getElementById('endBell').play();
@@ -186,15 +206,10 @@
         music.volume = 1;
         music.pause();
         music.currentTime = 0;
-
-        // Refresh page after 3 seconds to reset
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
+        setTimeout(() => window.location.reload(), 3000);
       }
     }
 
-    // Google Text-to-Speech function
     function speakText(text) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = "en-US";
