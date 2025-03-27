@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paper Timer (3 Hours)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(45deg, #ff0099, #ff6600, #66ccff, #33cc33);
+      color: white;
+      animation: fadeIn 2s ease-in-out, backgroundColorAnimation 6s infinite alternate;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      overflow: hidden;
+    }
+    h1 {
+      font-size: 4em;
+      font-weight: bold;
+      margin-bottom: 30px;
+      text-shadow: 0 0 20px #fff, 0 0 30px #ff0099, 0 0 50px #ff6600;
+    }
+    #timer {
+      font-size: 6em;
+      margin-top: 20px;
+      padding: 40px;
+      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      display: inline-block;
+      animation: colorChange 3s infinite alternate, glowEffect 1s infinite alternate;
+      text-shadow: 0 0 25px #ff0099, 0 0 50px #ff6600, 0 0 70px #66ccff;
+      transition: all 0.3s ease-in-out;
+    }
+    #timer:hover {
+      transform: scale(1.1);
+    }
+    button {
+      padding: 15px 25px;
+      font-size: 1.5em;
+      margin: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      border: 3px solid #fff;
+      border-radius: 15px;
+      background-color: transparent;
+      color: white;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #333;
+      transform: scale(1.1);
+      box-shadow: 0 0 15px #ff0099, 0 0 25px #ff6600;
+    }
+    #startBtn {
+      display: inline-block;
+      animation: buttonAnimation 1s infinite alternate;
+    }
+    #stopBtn, #pauseBtn {
+      display: none;
+      animation: buttonAnimation 1s infinite alternate;
+    }
+    @keyframes buttonAnimation {
+      0% {
+        transform: scale(1);
+        background-color: #5cb85c;
+      }
+      100% {
+        transform: scale(1.1);
+        background-color: #d9534f;
+      }
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    @keyframes backgroundColorAnimation {
+      0% { background: linear-gradient(45deg, #ff0099, #ff6600, #66ccff, #33cc33); }
+      50% { background: linear-gradient(45deg, #ff0033, #66cc33, #ffcc00, #3399ff); }
+      100% { background: linear-gradient(45deg, #ff0099, #ff6600, #66ccff, #33cc33); }
+    }
+    @keyframes glowEffect {
+      0% { box-shadow: 0 0 20px #ff0099, 0 0 40px #ff6600; }
+      50% { box-shadow: 0 0 60px #ff0099, 0 0 80px #66ccff; }
+      100% { box-shadow: 0 0 100px #ff0099, 0 0 120px #ff6600; }
+    }
+    @keyframes colorChange {
+      0% { color: #ff0099; }
+      50% { color: #ff6600; }
+      100% { color: #66ccff; }
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>Paper Timer (3 Hours)</h1>
+    <div id="timer">03:00:00</div>
+    <div>
+      <button id="startBtn" onclick="startTimer()">Start Now</button>
+      <button id="pauseBtn" onclick="pauseTimer()">Pause</button>
+      <button id="stopBtn" onclick="stopTimer()">Stop</button>
+    </div>
+  </div>
+
+  <audio id="backgroundMusic" src="https://www.myinstants.com/media/sounds/taco-bell-bong-sfx.mp3"></audio>
+  <audio id="twoHourSound" src="https://www.myinstants.com/media/sounds/taco-bell-bong-sfx.mp3"></audio>
+  <audio id="oneHourSound" src="https://www.myinstants.com/media/sounds/taco-bell-bong-sfx.mp3"></audio>
+  <audio id="endBell" src="https://www.myinstants.com/media/sounds/taco-bell-bong-sfx.mp3"></audio>
+
+  <script>
+    let time = 3 * 60 * 60; // 3 hours in seconds
+    let interval;
+    let music = document.getElementById('backgroundMusic');
+    let startBtn = document.getElementById('startBtn');
+    let stopBtn = document.getElementById('stopBtn');
+    let pauseBtn = document.getElementById('pauseBtn');
+    let isPaused = false;
+
+    function startTimer() {
+      // Start background music
+      music.currentTime = 0;
+      music.play().catch(error => console.log("Autoplay blocked: ", error));
+
+      // Show Stop and Pause buttons; hide Start button
+      startBtn.style.display = "none";
+      stopBtn.style.display = "inline-block";
+      pauseBtn.style.display = "inline-block";
+
+      // Announce start (Google TTS)
+      speakText("The paper has started!");
+
+      // Start timer
+      interval = setInterval(updateTimer, 1000);
+    }
+
+    function stopTimer() {
+      // Clear timer and refresh page to reset everything
+      clearInterval(interval);
+      window.location.reload();
+    }
+
+    function pauseTimer() {
+      if (!isPaused) {
+        clearInterval(interval);
+        pauseBtn.innerText = "Resume";
+        isPaused = true;
+      } else {
+        interval = setInterval(updateTimer, 1000);
+        pauseBtn.innerText = "Pause";
+        isPaused = false;
+      }
+    }
+
+    function updateTimer() {
+      time--;
+      let hours = Math.floor(time / 3600);
+      let minutes = Math.floor((time % 3600) / 60);
+      let seconds = time % 60;
+
+      document.getElementById('timer').innerText =
+        (hours < 10 ? "0" : "") + hours + ":" +
+        (minutes < 10 ? "0" : "") + minutes + ":" +
+        (seconds < 10 ? "0" : "") + seconds;
+
+      // When 2 hours remain
+      if (time === 2 * 60 * 60) {
+        document.getElementById('twoHourSound').play();
+        speakText("The time is now two hours remaining!");
+        music.volume = 0.3;
+      }
+
+      // When 1 hour remains
+      if (time === 1 * 60 * 60) {
+        document.getElementById('oneHourSound').play();
+        speakText("The time is now one hour remaining!");
+      }
+
+      // Timer ends
+      if (time <= 0) {
+        clearInterval(interval);
+        document.getElementById('endBell').play();
+        speakText("The time has ended!");
+        music.volume = 1;
+        music.pause();
+        music.currentTime = 0;
+
+        // Refresh page after 3 seconds to reset
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      }
+    }
+
+    // Google Text-to-Speech function
+    function speakText(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";
+      speechSynthesis.speak(utterance);
+    }
+  </script>
+</body>
+</html>
