@@ -5,41 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paper Timer (3 Hours)</title>
   <style>
-    /* Base Styles */
+    /* Basic reset and responsive container */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       background: linear-gradient(45deg, #ff0099, #ff6600, #66ccff, #33cc33);
       color: white;
       animation: fadeIn 2s ease-in-out, backgroundColorAnimation 6s infinite alternate;
-      margin: 0;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
       padding: 20px;
+      overflow: hidden;
     }
     .container {
-      max-width: 800px;
       width: 100%;
+      max-width: 600px;
     }
     h1 {
-      font-size: 3rem;
+      font-size: 2.5rem;
       font-weight: bold;
       margin-bottom: 20px;
-      text-shadow: 0 0 20px #fff, 0 0 30px #ff0099, 0 0 50px #ff6600;
+      text-shadow: 0 0 10px #fff, 0 0 20px #ff0099, 0 0 30px #ff6600;
     }
     #timer {
-      font-size: 4rem;
+      font-size: 3rem;
       padding: 20px;
-      border-radius: 20px;
+      border-radius: 15px;
       background: rgba(0, 0, 0, 0.7);
       display: inline-block;
       animation: colorChange 3s infinite alternate, glowEffect 1s infinite alternate;
-      text-shadow: 0 0 15px #ff0099, 0 0 30px #ff6600, 0 0 40px #66ccff;
-      transition: all 0.3s ease-in-out;
+      text-shadow: 0 0 10px #ff0099, 0 0 20px #ff6600, 0 0 30px #66ccff;
       margin-bottom: 20px;
+      transition: transform 0.3s ease;
     }
     #timer:hover {
       transform: scale(1.05);
@@ -61,27 +65,13 @@
       transform: scale(1.05);
       box-shadow: 0 0 10px #ff0099, 0 0 20px #ff6600;
     }
-    #startBtn {
-      display: inline-block;
-      animation: buttonAnimation 1s infinite alternate;
-    }
-    #stopBtn, #pauseBtn {
-      display: none;
-      animation: buttonAnimation 1s infinite alternate;
-    }
-    @keyframes buttonAnimation {
-      0% {
-        transform: scale(1);
-        background-color: #5cb85c;
-      }
-      100% {
-        transform: scale(1.05);
-        background-color: #d9534f;
-      }
-    }
+    /* Initially show only the Start button */
+    #startBtn { display: inline-block; }
+    #pauseBtn, #stopBtn { display: none; }
+    /* Animations */
     @keyframes fadeIn {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     @keyframes backgroundColorAnimation {
       0% { background: linear-gradient(45deg, #ff0099, #ff6600, #66ccff, #33cc33); }
@@ -98,33 +88,16 @@
       50% { color: #ff6600; }
       100% { color: #66ccff; }
     }
-    /* Responsive adjustments */
+    /* Media Queries for responsiveness */
     @media (max-width: 768px) {
-      h1 {
-        font-size: 2.5rem;
-      }
-      #timer {
-        font-size: 3rem;
-        padding: 15px;
-      }
-      button {
-        font-size: 1rem;
-        padding: 8px 16px;
-        margin: 8px;
-      }
+      h1 { font-size: 2rem; }
+      #timer { font-size: 2.5rem; padding: 15px; }
+      button { font-size: 1rem; padding: 8px 16px; margin: 8px; }
     }
     @media (max-width: 480px) {
-      h1 {
-        font-size: 2rem;
-      }
-      #timer {
-        font-size: 2.5rem;
-      }
-      button {
-        font-size: 0.9rem;
-        padding: 6px 12px;
-        margin: 6px;
-      }
+      h1 { font-size: 1.8rem; }
+      #timer { font-size: 2rem; padding: 10px; }
+      button { font-size: 0.9rem; padding: 6px 12px; margin: 6px; }
     }
   </style>
 </head>
@@ -165,7 +138,7 @@
 
     function stopTimer() {
       clearInterval(interval);
-      window.location.reload();
+      window.location.reload(); // Refresh page to reset everything
     }
 
     function pauseTimer() {
@@ -190,15 +163,18 @@
         (minutes < 10 ? "0" : "") + minutes + ":" +
         (seconds < 10 ? "0" : "") + seconds;
 
+      // 2 hours left alert
       if (time === 2 * 60 * 60) {
         document.getElementById('twoHourSound').play();
         speakText("The time is now two hours remaining!");
         music.volume = 0.3;
       }
+      // 1 hour left alert
       if (time === 1 * 60 * 60) {
         document.getElementById('oneHourSound').play();
         speakText("The time is now one hour remaining!");
       }
+      // Timer ends
       if (time <= 0) {
         clearInterval(interval);
         document.getElementById('endBell').play();
